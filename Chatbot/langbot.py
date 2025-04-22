@@ -3,7 +3,7 @@ import sys
 from typing import List, Optional, Dict, Any, TypedDict, Literal
 from pathlib import Path
 
-# Install necessary packages if not already installed
+ 
 try:
     from langchain_core.messages import HumanMessage, AIMessage
     from PIL import Image
@@ -17,25 +17,25 @@ except ImportError:
     import matplotlib.pyplot as plt
     from langchain_ollama import OllamaLLM
 
-# Define our simplified state schema
+ 
 class ChatState(TypedDict):
     """Represents the state of our chatbot application."""
     messages: List[Dict[str, Any]]
     image_path: Optional[str]
 
-# Initialize the LLM with a better balance of speed and quality
+ 
 def get_llm():
     """Get the language model - trying a more balanced model"""
     try:
-        # Mistral 7B is a good balance of speed and quality
-        # If still too slow, you can try phi:mini instead
+         
+         
         return OllamaLLM(
             model="mistral:7b", 
-            temperature=0.5,     # Lower temperature for more focused responses
-            max_tokens=300       # Limit response length for speed
+            temperature=0.5,      
+            max_tokens=300        
         )
     except Exception as e:
-        # Fallback to phi:mini if mistral isn't available
+         
         try:
             return OllamaLLM(model="phi:mini", temperature=0.5, max_tokens=300)
         except Exception:
@@ -45,28 +45,28 @@ def get_llm():
             print("After installing, run: 'ollama pull mistral:7b' or 'ollama pull phi:mini'")
             sys.exit(1)
 
-# Simplified chatbot function - single model call for speed
+ 
 def process_message(user_message: str, image_path: Optional[str] = None, chat_history: List[Dict] = None):
     """Process user input and return chatbot response."""
     if chat_history is None:
         chat_history = []
     
-    # Add user message to chat history
+     
     chat_history.append({"role": "human", "content": user_message})
     
     llm = get_llm()
     
-    # Handle image information if present
+     
     image_info = ""
     if image_path and Path(image_path).exists():
         image_info = f"\nThe user has also shared an image of {Path(image_path).name}. Consider this in your response."
     
-    # Extract recent conversation context (just the last exchange to keep it fast)
+     
     recent_context = ""
     if len(chat_history) > 2:
         recent_context = f"Previous message: {chat_history[-3]['content']}\nPrevious response: {chat_history[-2]['content']}\n"
     
-    # Prepare the prompt - optimized for concise, specific answers
+     
     full_prompt = f"""
     You are a recommendation assistant that provides clear, specific, and concise answers.
     
@@ -82,15 +82,15 @@ def process_message(user_message: str, image_path: Optional[str] = None, chat_hi
     Keep your entire response under 150 words. Be helpful but concise.
     """
     
-    # Get the response from the LLM
+     
     response = llm.invoke(full_prompt)
     
-    # Add the AI response to the messages
+     
     chat_history.append({"role": "ai", "content": response})
     
     return response, chat_history
 
-# Display image if provided
+ 
 def display_image(image_path: str):
     """Display the image using matplotlib."""
     if not image_path or not Path(image_path).exists():
@@ -105,7 +105,7 @@ def display_image(image_path: str):
     except Exception as e:
         print(f"Could not display image: {str(e)}")
 
-# Main program
+ 
 def main():
     """Main function to run the chatbot."""
     print("Optimized Recommendation Chatbot")
@@ -122,7 +122,7 @@ def main():
         
         image_path = None
         if "image:" in user_input:
-            # Parse image path
+             
             parts = user_input.split("image:")
             user_input = parts[0].strip()
             image_path = parts[1].strip()
@@ -132,7 +132,7 @@ def main():
         try:
             print("Chatbot is thinking...", end="", flush=True)
             response, chat_history = process_message(user_input, image_path, chat_history)
-            print("\r" + " " * 20 + "\r", end="")  # Clear the "thinking" message
+            print("\r" + " " * 20 + "\r", end="")   
             print(f"Chatbot: {response}")
         except Exception as e:
             print(f"\nError: {str(e)}")
