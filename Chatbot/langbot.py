@@ -25,7 +25,7 @@ except ImportError:
     from langgraph.graph import StateGraph, END
 
 # Set OpenRouter API key
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 
 # Create OpenAI client configured for OpenRouter
 client = OpenAI(
